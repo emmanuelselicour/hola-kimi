@@ -79,79 +79,235 @@ db.serialize(() => {
   )`);
 });
 
-// Routes principales avec gestion d'erreurs
-app.get('/', (req, res, next) => {
-  const today = new Date().toISOString().split('T')[0];
-  
-  db.get("SELECT * FROM visitors WHERE date = ?", [today], (err, row) => {
-    if (err) return next(err);
-    
-    if (row) {
-      db.run("UPDATE visitors SET count = count + 1 WHERE date = ?", [today]);
-    } else {
-      db.run("INSERT INTO visitors (date, count) VALUES (?, 1)", [today]);
-    }
-  });
+// ✅ PAGE TEMPORAIRE - En attendant les fichiers EJS
+app.get('/', (req, res) => {
+  const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDS Store - Votre Boutique Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .hero {
+            margin: 3rem 0;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+        .btn-primary {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-primary:hover {
+            background: #c0392b;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .products-preview {
+            margin: 4rem 0;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .product-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .admin-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 3rem 0;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .btn { padding: 1rem 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🛍️ EDS STORE</div>
+        
+        <div class="hero">
+            <h1>Bienvenue chez EDS Store !</h1>
+            <p>Votre boutique de confiance pour les vêtements, montres, chaussures et bijoux</p>
+            
+            <div class="btn-group">
+                <a href="/seed" class="btn btn-primary">🌱 Charger les Produits</a>
+                <a href="/admin" class="btn">⚙️ Administration</a>
+                <a href="/api/products" class="btn">📦 Voir les Produits (API)</a>
+            </div>
+        </div>
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = 20;
-  const offset = (page - 1) * limit;
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🚚</div>
+                <h3>Livraison Rapide</h3>
+                <p>2-3 jours ouvrables partout dans le pays</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💳</div>
+                <h3>Paiement Sécurisé</h3>
+                <p>PayPal, NatCash, MonCash</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛒</div>
+                <h3>Easy Shopping</h3>
+                <p>Expérience d'achat simplifiée</p>
+            </div>
+        </div>
 
-  db.all("SELECT * FROM products ORDER BY RANDOM() LIMIT ? OFFSET ?", [limit, offset], (err, products) => {
-    if (err) return next(err);
-    
-    db.get("SELECT COUNT(*) as total FROM products", (err, countResult) => {
-      if (err) return next(err);
-      
-      const totalPages = Math.ceil(countResult.total / limit);
-      
-      res.render('index', {
-        products: products || [],
-        currentPage: page,
-        totalPages: totalPages,
-        language: res.locals.language
-      });
-    });
-  });
+        <div class="admin-panel">
+            <h2>🚀 Panel d'Administration</h2>
+            <p>Gérez votre boutique facilement</p>
+            <div class="btn-group">
+                <a href="/admin" class="btn">📊 Tableau de Bord</a>
+                <a href="/seed" class="btn">🔄 Recharger Produits</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2);">
+            <p>📍 Votre site est live à : <strong>https://easy-deal-store.onrender.com</strong></p>
+            <p style="margin-top: 1rem; opacity: 0.8;">© 2024 EDS Store - Tous droits réservés</p>
+        </div>
+    </div>
+
+    <script>
+        // Chatbot simple
+        console.log('🚀 EDS Store chargé avec succès!');
+    </script>
+</body>
+</html>
+  `;
+  res.send(html);
 });
 
-app.get('/product/:id', (req, res, next) => {
-  const productId = parseInt(req.params.id);
-  
-  if (isNaN(productId)) {
-    return res.status(400).render('404', { language: res.locals.language });
-  }
-
-  db.get("SELECT * FROM products WHERE id = ?", [productId], (err, product) => {
-    if (err) return next(err);
-    if (!product) return res.status(404).render('404', { language: res.locals.language });
-    
-    db.all("SELECT * FROM products WHERE category = ? AND id != ? ORDER BY RANDOM() LIMIT 4", 
-      [product.category, productId], (err, similarProducts) => {
-        if (err) return next(err);
-        
-        res.render('product', {
-          product: product,
-          similarProducts: similarProducts || [],
-          language: res.locals.language
-        });
-    });
-  });
+// Routes API et fonctionnelles
+app.get('/product/:id', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Produit - EDS Store</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 2rem;">
+      <h1>📦 Page Produit</h1>
+      <p>Produit ID: ${req.params.id}</p>
+      <a href="/">← Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 app.get('/cart', (req, res) => {
-  res.render('cart', { language: res.locals.language });
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Panier - EDS Store</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 2rem;">
+      <h1>🛒 Votre Panier</h1>
+      <p>Fonctionnalité panier à venir...</p>
+      <a href="/">← Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 app.get('/checkout', (req, res) => {
-  res.render('checkout', { language: res.locals.language });
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Checkout - EDS Store</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 2rem;">
+      <h1>💰 Checkout</h1>
+      <p>Fonctionnalité checkout à venir...</p>
+      <a href="/">← Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 app.get('/order-success', (req, res) => {
-  res.render('order-success', { 
-    orderId: req.query.orderId,
-    language: res.locals.language 
-  });
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Commande Confirmée - EDS Store</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 2rem;">
+      <h1>🎉 Commande Confirmée !</h1>
+      <p>Merci pour votre commande !</p>
+      <a href="/">← Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 // API Routes avec validation
@@ -236,22 +392,66 @@ app.post('/api/chatbot', (req, res, next) => {
   );
 });
 
-// Admin Routes
+// Admin Routes - Version simple
 app.get('/admin', (req, res, next) => {
-  db.all("SELECT * FROM orders ORDER BY order_date DESC LIMIT 50", (err, orders) => {
+  db.all("SELECT * FROM orders ORDER BY order_date DESC LIMIT 10", (err, orders) => {
     if (err) return next(err);
     
-    db.all("SELECT * FROM chatbot_conversations ORDER BY timestamp DESC LIMIT 50", (err, conversations) => {
+    db.all("SELECT * FROM chatbot_conversations ORDER BY timestamp DESC LIMIT 10", (err, conversations) => {
       if (err) return next(err);
       
-      db.all("SELECT * FROM visitors ORDER BY date DESC LIMIT 30", (err, visitors) => {
+      db.all("SELECT * FROM visitors ORDER BY date DESC LIMIT 7", (err, visitors) => {
         if (err) return next(err);
         
-        res.render('admin', {
-          orders: orders || [],
-          conversations: conversations || [],
-          visitors: visitors || []
-        });
+        const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin EDS</title>
+    <style>
+        body { font-family: Arial; margin: 0; padding: 2rem; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .stat { text-align: center; padding: 1rem; }
+        .btn { background: #3498db; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; margin: 0.2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Administration EDS Store</h1>
+        
+        <div class="stats">
+            <div class="card stat">
+                <h3>Commandes</h3>
+                <div style="font-size: 2rem;">${orders.length}</div>
+            </div>
+            <div class="card stat">
+                <h3>Conversations</h3>
+                <div style="font-size: 2rem;">${conversations.length}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Dernières Commandes</h2>
+            ${orders.map(order => `
+                <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
+                    <strong>${order.customer_name}</strong> - $${order.total_amount}
+                    <br><small>${new Date(order.order_date).toLocaleDateString()}</small>
+                </div>
+            `).join('') || '<p>Aucune commande</p>'}
+        </div>
+
+        <div class="card">
+            <h2>Actions</h2>
+            <a href="/seed" class="btn">🌱 Recharger Produits</a>
+            <a href="/" class="btn">🏠 Accueil</a>
+        </div>
+    </div>
+</body>
+</html>
+        `;
+        res.send(html);
       });
     });
   });
@@ -259,33 +459,72 @@ app.get('/admin', (req, res, next) => {
 
 // Auto-seed si pas de produits
 app.get('/seed', (req, res) => {
-  const { spawn } = require('child_process');
-  const seedProcess = spawn('node', ['seed.js']);
+  const { exec } = require('child_process');
   
-  seedProcess.stdout.on('data', (data) => {
-    console.log(`Seed: ${data}`);
-  });
-  
-  seedProcess.stderr.on('data', (data) => {
-    console.error(`Seed Error: ${data}`);
-  });
-  
-  seedProcess.on('close', (code) => {
-    res.send(`Seed process exited with code ${code}. <a href="/">Retour à l'accueil</a>`);
+  console.log('🌱 Lancement manuel du seed...');
+  exec('node seed.js', (error, stdout, stderr) => {
+    if (error) {
+      console.error('❌ Erreur seed:', error);
+      return res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Seed Error</title></head>
+        <body style="font-family: Arial; text-align: center; padding: 2rem;">
+          <h1>❌ Erreur lors du seed</h1>
+          <pre>${error.message}</pre>
+          <a href="/">← Retour à l'accueil</a>
+        </body>
+        </html>
+      `);
+    }
+    
+    console.log('✅ Seed terminé:', stdout);
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Seed Réussi</title></head>
+      <body style="font-family: Arial; text-align: center; padding: 2rem;">
+        <h1>✅ Seed Réussi !</h1>
+        <p>Les produits ont été chargés dans la base de données.</p>
+        <pre style="background: #f5f5f5; padding: 1rem; text-align: left; max-width: 600px; margin: 1rem auto;">${stdout}</pre>
+        <div>
+          <a href="/" class="btn" style="background: #3498db; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">🏠 Accueil</a>
+          <a href="/api/products" class="btn" style="background: #27ae60; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">📦 Voir Produits</a>
+        </div>
+      </body>
+      </html>
+    `);
   });
 });
 
 // Gestion d'erreurs centralisée
 app.use((req, res) => {
-  res.status(404).render('404', { language: res.locals.language });
+  res.status(404).send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Page Non Trouvée</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 4rem;">
+      <h1>😕 Page Non Trouvée</h1>
+      <p>La page que vous recherchez n'existe pas.</p>
+      <a href="/" style="background: #3498db; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px;">🏠 Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 app.use((err, req, res, next) => {
   console.error('Erreur serveur:', err);
-  res.status(500).render('500', { 
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Une erreur est survenue',
-    language: res.locals.language
-  });
+  res.status(500).send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Erreur Serveur</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 4rem;">
+      <h1>⚠️ Erreur Serveur</h1>
+      <p>Une erreur technique est survenue.</p>
+      <a href="/" style="background: #3498db; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px;">🏠 Retour à l'accueil</a>
+    </body>
+    </html>
+  `);
 });
 
 function generateBotResponse(message) {
@@ -300,29 +539,10 @@ function generateBotResponse(message) {
       products: "🌟 EDS propose une large gamme de vêtements, montres, chaussures et bijoux de qualité. Utilisez les filtres pour trouver exactement ce qu'il vous faut !",
       company: "🏪 EDS est votre boutique de confiance pour la mode et les accessoires. Nous nous engageons à vous offrir les meilleurs produits aux prix les plus compétitifs !",
       default: "🤔 Je suis ici pour vous parler des merveilleux produits EDS ! Avez-vous des questions sur nos collections, la livraison ou le paiement ? Ou peut-être souhaitez-vous découvrir nos nouvelles arrivées ?"
-    },
-    en: {
-      greetings: "👋 Hello! I'm your EDS assistant. How can I help you today? Would you like to place an order or do you have questions about our products?",
-      delivery: "🚚 We offer express delivery within 2-3 business days! EDS is committed to delivering quickly throughout the country. Free shipping from $50!",
-      payment: "💳 EDS accepts PayPal, NatCash and MonCash for your convenience. All our payments are secure and encrypted!",
-      order: "🛍️ Excellent choice! To order, simply add products to your cart and follow the checkout process. Need help with a specific product?",
-      products: "🌟 EDS offers a wide range of quality clothing, watches, shoes and jewelry. Use the filters to find exactly what you need!",
-      company: "🏪 EDS is your trusted store for fashion and accessories. We are committed to offering you the best products at the most competitive prices!",
-      default: "🤔 I'm here to tell you about the wonderful EDS products! Do you have questions about our collections, delivery or payment? Or maybe you'd like to discover our new arrivals?"
-    },
-    es: {
-      greetings: "👋 ¡Hola! Soy tu asistente EDS. ¿Cómo puedo ayudarte hoy? ¿Quieres realizar un pedido o tienes preguntas sobre nuestros productos?",
-      delivery: "🚚 ¡Ofrecemos entrega exprés en 2-3 días laborables! EDS se compromete a entregar rápidamente en todo el país. ¡Envío gratis desde $50!",
-      payment: "💳 EDS acepta PayPal, NatCash y MonCash para tu comodidad. ¡Todos nuestros pagos son seguros y encriptados!",
-      order: "🛍️ ¡Excelente elección! Para pedir, simplemente añade productos a tu carrito y sigue el proceso de checkout. ¿Necesitas ayuda con un producto específico?",
-      products: "🌟 EDS ofrece una amplia gama de ropa, relojes, zapatos y joyas de calidad. ¡Usa los filtros para encontrar exactamente lo que necesitas!",
-      company: "🏪 EDS es tu tienda de confianza para moda y accesorios. ¡Nos comprometemos a ofrecerte los mejores productos a los precios más competitivos!",
-      default: "🤔 ¡Estoy aquí para hablarte de los maravillosos productos EDS! ¿Tienes preguntas sobre nuestras colecciones, entrega o pago? ¿O quizás te gustaría descubrir nuestras novedades?"
     }
   };
 
-  const lang = res.locals.language;
-  const langResponses = responses[lang] || responses.fr;
+  const langResponses = responses.fr;
 
   if (lowerMessage.includes('bonjour') || lowerMessage.includes('salut') || lowerMessage.includes('hello') || lowerMessage.includes('hola')) {
     return langResponses.greetings;
@@ -346,25 +566,17 @@ function generateBotResponse(message) {
   return langResponses.default;
 }
 
-// Auto-initialisation des produits au démarrage
+// Vérification simple des produits au démarrage
 db.get("SELECT COUNT(*) as count FROM products", (err, result) => {
   if (err) {
     console.error('❌ Erreur vérification produits:', err);
-    return;
-  }
-  
-  if (result.count === 0) {
-    console.log('🔄 Aucun produit trouvé. Lancement du seed automatique...');
-    const { exec } = require('child_process');
-    exec('node seed.js', (error, stdout, stderr) => {
-      if (error) {
-        console.error('❌ Erreur seed automatique:', error);
-        return;
-      }
-      console.log('✅ Seed automatique terminé:', stdout);
-    });
   } else {
-    console.log(`✅ ${result.count} produits chargés dans la base de données`);
+    console.log(`📊 ${result.count} produits dans la base de données`);
+    
+    // Auto-seed si pas de produits
+    if (result.count === 0) {
+      console.log('🔄 Aucun produit trouvé. Utilisez /seed pour charger les produits.');
+    }
   }
 });
 
@@ -374,4 +586,5 @@ app.listen(PORT, () => {
   console.log(`⚙️ Admin: http://localhost:${PORT}/admin`);
   console.log(`🌱 Seed: http://localhost:${PORT}/seed`);
   console.log(`✅ Base de données: ${dbPath}`);
+  console.log(`🎉 Votre site est PRÊT !`);
 });
