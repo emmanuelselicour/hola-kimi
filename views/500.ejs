@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur Serveur - EDS Store</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main style="max-width: 600px; margin: 4rem auto; padding: 0 1rem; text-align: center;">
+        <div style="font-size: 6rem; margin-bottom: 2rem;">⚠️</div>
+        <h1 style="margin-bottom: 1rem;">
+            <%= language === 'fr' ? 'Erreur Serveur' : language === 'en' ? 'Server Error' : 'Error del Servidor' %>
+        </h1>
+        <p style="color: #666; margin-bottom: 2rem; line-height: 1.6;">
+            <%= language === 'fr' ? 
+                'Une erreur technique est survenue. Notre équipe a été notifiée et travaille à la résolution du problème.' :
+                language === 'en' ?
+                'A technical error has occurred. Our team has been notified and is working on resolving the issue.' :
+                'Ha ocurrido un error técnico. Nuestro equipo ha sido notificado y está trabajando en resolver el problema.'
+            %>
+        </p>
+        <% if (error) { %>
+            <details style="background: #f8f9fa; padding: 1rem; border-radius: 5px; margin-bottom: 2rem; text-align: left;">
+                <summary style="cursor: pointer; font-weight: bold;">
+                    <%= language === 'fr' ? 'Détails techniques' : language === 'en' ? 'Technical Details' : 'Detalles Técnicos' %>
+                </summary>
+                <code style="color: #e74c3c; margin-top: 1rem; display: block;"><%= error %></code>
+            </details>
+        <% } %>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/" style="background: var(--secondary-color); color: white; padding: 1rem 2rem; border-radius: 5px; text-decoration: none;">
+                <%= language === 'fr' ? 'Accueil' : language === 'en' ? 'Home' : 'Inicio' %>
+            </a>
+            <button onclick="window.location.reload()" style="background: var(--primary-color); color: white; border: none; padding: 1rem 2rem; border-radius: 5px; cursor: pointer;">
+                <%= language === 'fr' ? 'Réessayer' : language === 'en' ? 'Retry' : 'Reintentar' %>
+            </button>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
