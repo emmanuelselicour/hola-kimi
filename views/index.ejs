@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDS Store - Votre Boutique Mode</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem; text-align: center;">
+        <h1>Bienvenue chez EDS Store ! 🎉</h1>
+        <p>Votre boutique de vêtements, montres, chaussures et bijoux.</p>
+        
+        <div style="margin: 3rem 0;">
+            <a href="/seed" style="background: #3498db; color: white; padding: 1rem 2rem; border-radius: 5px; text-decoration: none; margin: 0 1rem;">
+                🌱 Charger les Produits
+            </a>
+            <a href="/admin" style="background: #2c3e50; color: white; padding: 1rem 2rem; border-radius: 5px; text-decoration: none; margin: 0 1rem;">
+                ⚙️ Administration
+            </a>
+        </div>
+
+        <div id="productsContainer">
+            <!-- Les produits apparaîtront ici après le seed -->
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+    <%- include('partials/chatbot') %>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
