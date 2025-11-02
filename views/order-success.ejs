@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande Confirmée - EDS Store</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main style="max-width: 600px; margin: 4rem auto; padding: 0 1rem; text-align: center;">
+        <div style="font-size: 6rem; margin-bottom: 2rem;">🎉</div>
+        <h1 style="margin-bottom: 1rem; color: #27ae60;">
+            <%= language === 'fr' ? 'Commande Confirmée !' : language === 'en' ? 'Order Confirmed!' : '¡Pedido Confirmado!' %>
+        </h1>
+        
+        <% if (orderId) { %>
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem;">
+                <p style="margin-bottom: 0.5rem;">
+                    <strong>
+                        <%= language === 'fr' ? 'Numéro de commande' : language === 'en' ? 'Order Number' : 'Número de Pedido' %>:
+                    </strong>
+                    #<%= orderId %>
+                </p>
+                <p style="color: #666; font-size: 0.9rem;">
+                    <%= language === 'fr' ? 
+                        'Conservez ce numéro pour le suivi de votre commande' :
+                        language === 'en' ?
+                        'Keep this number for order tracking' :
+                        'Conserva este número para el seguimiento de tu pedido'
+                    %>
+                </p>
+            </div>
+        <% } %>
+
+        <p style="color: #666; margin-bottom: 2rem; line-height: 1.6;">
+            <%= language === 'fr' ? 
+                'Merci pour votre commande ! Vous recevrez un email de confirmation sous peu. Notre équipe prépare déjà votre colis.' :
+                language === 'en' ?
+                'Thank you for your order! You will receive a confirmation email shortly. Our team is already preparing your package.' :
+                '¡Gracias por tu pedido! Recibirás un email de confirmación en breve. Nuestro equipo ya está preparando tu paquete.'
+            %>
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: var(--shadow);">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📦</div>
+                <h3 style="margin-bottom: 0.5rem;">
+                    <%= language === 'fr' ? 'Livraison' : language === 'en' ? 'Delivery' : 'Entrega' %>
+                </h3>
+                <p style="color: #666; font-size: 0.9rem;">
+                    <%= language === 'fr' ? 
+                        '2-3 jours ouvrables' :
+                        language === 'en' ?
+                        '2-3 business days' :
+                        '2-3 días laborables'
+                    %>
+                </p>
+            </div>
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: var(--shadow);">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+                <h3 style="margin-bottom: 0.5rem;">
+                    <%= language === 'fr' ? 'Suivi' : language === 'en' ? 'Tracking' : 'Seguimiento' %>
+                </h3>
+                <p style="color: #666; font-size: 0.9rem;">
+                    <%= language === 'fr' ? 
+                        'Disponible sous 24h' :
+                        language === 'en' ?
+                        'Available within 24h' :
+                        'Disponible en 24h'
+                    %>
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/" style="background: var(--secondary-color); color: white; padding: 1rem 2rem; border-radius: 5px; text-decoration: none;">
+                <%= language === 'fr' ? 'Continuer les achats' : language === 'en' ? 'Continue Shopping' : 'Seguir Comprando' %>
+            </a>
+            <a href="/contact" style="background: transparent; color: var(--primary-color); padding: 1rem 2rem; border-radius: 5px; text-decoration: none; border: 2px solid var(--primary-color);">
+                <%= language === 'fr' ? 'Nous contacter' : language === 'en' ? 'Contact Us' : 'Contactarnos' %>
+            </a>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+    <%- include('partials/chatbot') %>
+
+    <script src="/js/main.js"></script>
+    <script>
+        // Vider le panier après commande réussie
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof cart !== 'undefined') {
+                cart.clearCart();
+            }
+        });
+    </script>
+</body>
+</html>
