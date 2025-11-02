@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Non Trouvée - EDS Store</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main style="max-width: 600px; margin: 4rem auto; padding: 0 1rem; text-align: center;">
+        <div style="font-size: 6rem; margin-bottom: 2rem;">😕</div>
+        <h1 style="margin-bottom: 1rem;">
+            <%= language === 'fr' ? 'Page Non Trouvée' : language === 'en' ? 'Page Not Found' : 'Página No Encontrada' %>
+        </h1>
+        <p style="color: #666; margin-bottom: 2rem; line-height: 1.6;">
+            <%= language === 'fr' ? 
+                'Désolé, la page que vous recherchez n\'existe pas. Elle a peut-être été déplacée ou supprimée.' :
+                language === 'en' ?
+                'Sorry, the page you are looking for does not exist. It might have been moved or deleted.' :
+                'Lo siento, la página que buscas no existe. Puede que haya sido movida o eliminada.'
+            %>
+        </p>
+        <a href="/" style="background: var(--secondary-color); color: white; padding: 1rem 2rem; border-radius: 5px; text-decoration: none; display: inline-block;">
+            <%= language === 'fr' ? 'Retour à l\'accueil' : language === 'en' ? 'Back to Home' : 'Volver al Inicio' %>
+        </a>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
