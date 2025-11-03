@@ -79,7 +79,7 @@ db.serialize(() => {
   )`);
 });
 
-// ✅ PAGE TEMPORAIRE - En attendant les fichiers EJS
+// ✅ PAGE D'ACCUEIL MAGNIFIQUE
 app.get('/', (req, res) => {
   const html = `
 <!DOCTYPE html>
@@ -204,9 +204,9 @@ app.get('/', (req, res) => {
             <p>Votre boutique de confiance pour les vêtements, montres, chaussures et bijoux</p>
             
             <div class="btn-group">
-                <a href="/seed" class="btn btn-primary">🌱 Charger les Produits</a>
+                <a href="/products" class="btn btn-primary">🛍️ Voir les Produits</a>
                 <a href="/admin" class="btn">⚙️ Administration</a>
-                <a href="/api/products" class="btn">📦 Voir les Produits (API)</a>
+                <a href="/seed" class="btn">🌱 Recharger Produits</a>
             </div>
         </div>
 
@@ -233,7 +233,7 @@ app.get('/', (req, res) => {
             <p>Gérez votre boutique facilement</p>
             <div class="btn-group">
                 <a href="/admin" class="btn">📊 Tableau de Bord</a>
-                <a href="/seed" class="btn">🔄 Recharger Produits</a>
+                <a href="/api/products" class="btn">📡 API Produits</a>
             </div>
         </div>
 
@@ -244,7 +244,6 @@ app.get('/', (req, res) => {
     </div>
 
     <script>
-        // Chatbot simple
         console.log('🚀 EDS Store chargé avec succès!');
     </script>
 </body>
@@ -253,7 +252,229 @@ app.get('/', (req, res) => {
   res.send(html);
 });
 
-// Routes API et fonctionnelles
+// ✅ PAGE PRODUITS MAGNIFIQUE
+app.get('/products', (req, res) => {
+  db.all("SELECT * FROM products ORDER BY RANDOM() LIMIT 20", (err, products) => {
+    if (err) {
+      return res.status(500).send('Erreur base de données');
+    }
+
+    const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nos Produits - EDS Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 1.5rem;
+        }
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        .product-price {
+            color: #e74c3c;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .product-category {
+            background: #3498db;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #219652;
+        }
+        .nav {
+            text-align: center;
+            margin: 3rem 0;
+        }
+        .nav a {
+            background: #3498db;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 0 0.5rem;
+            display: inline-block;
+        }
+        .stats {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Nos Produits EDS</h1>
+            <p>Découvrez notre collection exclusive de vêtements, montres, chaussures et bijoux</p>
+        </div>
+
+        <div class="nav">
+            <a href="/">🏠 Accueil</a>
+            <a href="/admin">⚙️ Administration</a>
+            <a href="/api/products">📊 API Produits</a>
+            <a href="/seed">🔄 Recharger</a>
+        </div>
+
+        <div class="stats">
+            <h3>📦 ${products.length} produits disponibles</h3>
+            <p>Prix de $10 à $210 - Catégories: Homme, Femme, Enfant</p>
+        </div>
+
+        <div class="products-grid">
+            ${products.map(product => {
+                const images = JSON.parse(product.images);
+                return `
+                <div class="product-card">
+                    <img src="${images[0]}" alt="${product.name}" class="product-image" 
+                         onerror="this.src='https://picsum.photos/400/400?random=1'">
+                    <div class="product-info">
+                        <div class="product-category">${product.category.toUpperCase()}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
+                        <button class="btn" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">
+                            🛒 Ajouter au Panier
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('')}
+        </div>
+
+        <div class="nav">
+            <p>🎯 Produits chargés avec succès depuis la base de données</p>
+            <a href="/">🏠 Retour à l'accueil</a>
+        </div>
+    </div>
+
+    <script>
+        function addToCart(id, name, price) {
+            alert('🎉 ' + name + ' ajouté au panier !\\nPrix: $' + price);
+            // Ici vous pouvez ajouter la logique pour le panier
+        }
+
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = (index * 0.1) + 's';
+                card.style.animation = 'fadeInUp 0.6s ease-out forwards';
+            });
+        });
+
+        // Ajouter l'animation CSS
+        const style = document.createElement('style');
+        style.textContent = \`
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .product-card {
+                opacity: 0;
+            }
+        \`;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+    `;
+    res.send(html);
+  });
+});
+
+// Routes simples pour les autres pages
 app.get('/product/:id', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -262,7 +483,7 @@ app.get('/product/:id', (req, res) => {
     <body style="font-family: Arial; text-align: center; padding: 2rem;">
       <h1>📦 Page Produit</h1>
       <p>Produit ID: ${req.params.id}</p>
-      <a href="/">← Retour à l'accueil</a>
+      <a href="/products">← Retour aux produits</a>
     </body>
     </html>
   `);
@@ -276,7 +497,7 @@ app.get('/cart', (req, res) => {
     <body style="font-family: Arial; text-align: center; padding: 2rem;">
       <h1>🛒 Votre Panier</h1>
       <p>Fonctionnalité panier à venir...</p>
-      <a href="/">← Retour à l'accueil</a>
+      <a href="/products">← Retour aux produits</a>
     </body>
     </html>
   `);
@@ -290,7 +511,7 @@ app.get('/checkout', (req, res) => {
     <body style="font-family: Arial; text-align: center; padding: 2rem;">
       <h1>💰 Checkout</h1>
       <p>Fonctionnalité checkout à venir...</p>
-      <a href="/">← Retour à l'accueil</a>
+      <a href="/cart">← Retour au panier</a>
     </body>
     </html>
   `);
@@ -403,7 +624,10 @@ app.get('/admin', (req, res, next) => {
       db.all("SELECT * FROM visitors ORDER BY date DESC LIMIT 7", (err, visitors) => {
         if (err) return next(err);
         
-        const html = `
+        db.get("SELECT COUNT(*) as productCount FROM products", (err, productResult) => {
+          if (err) return next(err);
+          
+          const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -413,8 +637,14 @@ app.get('/admin', (req, res, next) => {
         .container { max-width: 1200px; margin: 0 auto; }
         .card { background: white; padding: 1.5rem; margin: 1rem 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
-        .stat { text-align: center; padding: 1rem; }
-        .btn { background: #3498db; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; margin: 0.2rem; }
+        .stat { text-align: center; padding: 1rem; border-radius: 8px; }
+        .stat-products { background: #3498db; color: white; }
+        .stat-orders { background: #27ae60; color: white; }
+        .stat-chat { background: #e74c3c; color: white; }
+        .btn { background: #3498db; color: white; padding: 0.5rem 1rem; text-decoration: none; border-radius: 4px; margin: 0.2rem; display: inline-block; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -422,36 +652,59 @@ app.get('/admin', (req, res, next) => {
         <h1>⚙️ Administration EDS Store</h1>
         
         <div class="stats">
-            <div class="card stat">
+            <div class="stat stat-products">
+                <h3>Produits</h3>
+                <div style="font-size: 2rem;">${productResult.productCount}</div>
+            </div>
+            <div class="stat stat-orders">
                 <h3>Commandes</h3>
                 <div style="font-size: 2rem;">${orders.length}</div>
             </div>
-            <div class="card stat">
+            <div class="stat stat-chat">
                 <h3>Conversations</h3>
                 <div style="font-size: 2rem;">${conversations.length}</div>
             </div>
         </div>
 
         <div class="card">
-            <h2>Dernières Commandes</h2>
-            ${orders.map(order => `
-                <div style="border-bottom: 1px solid #eee; padding: 0.5rem 0;">
-                    <strong>${order.customer_name}</strong> - $${order.total_amount}
-                    <br><small>${new Date(order.order_date).toLocaleDateString()}</small>
-                </div>
-            `).join('') || '<p>Aucune commande</p>'}
+            <h2>📊 Dernières Commandes</h2>
+            ${orders.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Téléphone</th>
+                        <th>Montant</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${orders.map(order => `
+                        <tr>
+                            <td>${order.customer_name}</td>
+                            <td>${order.customer_phone}</td>
+                            <td>$${order.total_amount}</td>
+                            <td>${new Date(order.order_date).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ` : '<p>Aucune commande pour le moment</p>'}
         </div>
 
         <div class="card">
-            <h2>Actions</h2>
+            <h2>🚀 Actions Rapides</h2>
             <a href="/seed" class="btn">🌱 Recharger Produits</a>
+            <a href="/products" class="btn">🛍️ Voir Produits</a>
             <a href="/" class="btn">🏠 Accueil</a>
+            <a href="/api/products" class="btn">📡 API Produits</a>
         </div>
     </div>
 </body>
 </html>
         `;
         res.send(html);
+        });
       });
     });
   });
@@ -488,8 +741,8 @@ app.get('/seed', (req, res) => {
         <p>Les produits ont été chargés dans la base de données.</p>
         <pre style="background: #f5f5f5; padding: 1rem; text-align: left; max-width: 600px; margin: 1rem auto;">${stdout}</pre>
         <div>
-          <a href="/" class="btn" style="background: #3498db; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">🏠 Accueil</a>
-          <a href="/api/products" class="btn" style="background: #27ae60; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">📦 Voir Produits</a>
+          <a href="/products" class="btn" style="background: #3498db; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">🛍️ Voir Produits</a>
+          <a href="/" class="btn" style="background: #27ae60; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 5px; margin: 0.5rem;">🏠 Accueil</a>
         </div>
       </body>
       </html>
@@ -583,8 +836,10 @@ db.get("SELECT COUNT(*) as count FROM products", (err, result) => {
 app.listen(PORT, () => {
   console.log(`🚀 EDS Server v2.0 running on port ${PORT}`);
   console.log(`📱 Site: http://localhost:${PORT}`);
+  console.log(`🛍️ Produits: http://localhost:${PORT}/products`);
   console.log(`⚙️ Admin: http://localhost:${PORT}/admin`);
   console.log(`🌱 Seed: http://localhost:${PORT}/seed`);
+  console.log(`📊 API: http://localhost:${PORT}/api/products`);
   console.log(`✅ Base de données: ${dbPath}`);
-  console.log(`🎉 Votre site est PRÊT !`);
+  console.log(`🎉 Votre site e-commerce est PRÊT !`);
 });
